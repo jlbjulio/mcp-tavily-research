@@ -7,7 +7,7 @@ import {
   TAVILY_CITATION_FORMATS,
   TAVILY_OUTPUT_LENGTHS,
   TAVILY_RESEARCH_MODELS,
-} from "../clients/tavily-research-client.js";
+} from "../tavily/research.js";
 
 export function registerTavilyResearchTools(
   server: McpServer,

@@ -6,7 +6,7 @@ import {
   getTavilyImageUrl,
   TAVILY_CONTENT_FORMATS,
   TAVILY_EXTRACT_DEPTHS,
-} from "../clients/tavily-extract-client.js";
+} from "../tavily/extract.js";
 
 const webUrlSchema = z
   .string()

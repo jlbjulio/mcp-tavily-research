@@ -108,7 +108,8 @@ Check [Tavily's current credit documentation](https://docs.tavily.com/documentat
 ## Project structure
 
 - `src/tools/`: tools exposed to MCP clients.
-- `src/clients/`: one self-contained API client for each Tavily endpoint, plus the shared HTTP client.
+- `src/tavily/api.ts`: shared connection, authentication, errors, and response validation.
+- `src/tavily/search.ts`, `extract.ts`, `crawl.ts`, and `research.ts`: Tavily endpoint logic.
 - `src/server.ts`: server setup and tool registration.
 - `src/index.ts`: STDIO entry point.
 - `src/config.ts`: API key configuration.

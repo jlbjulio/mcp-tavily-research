@@ -1,6 +1,6 @@
 import * as z from "zod/v4";
 
-import { requestTavilyJson } from "./tavily-http-client.js";
+import { requestTavilyJson } from "./api.js";
 
 const TAVILY_SEARCH_PATH = "/search";
 const DEFAULT_MAX_RESULTS = 8;

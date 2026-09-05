@@ -6,7 +6,7 @@ import {
   TAVILY_SEARCH_DEPTHS,
   TAVILY_SEARCH_TOPICS,
   TAVILY_TIME_RANGES,
-} from "../clients/tavily-search-client.js";
+} from "../tavily/search.js";
 
 export function registerTavilySearchTool(
   server: McpServer,
