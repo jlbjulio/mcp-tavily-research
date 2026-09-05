@@ -2,8 +2,6 @@
 
 A TypeScript MCP server that gives coding agents access to Tavily Search, Extract, Crawl, and Research.
 
-> Personal project. Not affiliated with Tavily.
-
 ## Tools
 
 | Tool | Use it for |
