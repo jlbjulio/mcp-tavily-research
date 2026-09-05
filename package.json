@@ -1,7 +1,7 @@
 {
   "name": "mcp-tavily-research",
   "version": "1.0.0",
-  "description": "An MCP server that brings Tavily-powered web research to AI coding agents",
+  "description": "An MCP server for Tavily-powered search, extraction, crawling, and research",
   "main": "dist/index.js",
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
@@ -20,6 +20,8 @@
     "model-context-protocol",
     "tavily",
     "search",
+    "extract",
+    "crawl",
     "research",
     "typescript"
   ],

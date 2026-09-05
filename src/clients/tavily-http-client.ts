@@ -11,6 +11,7 @@ const REQUEST_TIMEOUT_MS = 30_000;
 interface TavilyRequestOptions {
   method: "GET" | "POST";
   body?: unknown;
+  timeoutMs?: number;
 }
 
 /**
@@ -40,7 +41,9 @@ export async function requestTavilyJson(
   const requestOptions: RequestInit = {
     method: options.method,
     headers,
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    signal: AbortSignal.timeout(
+      options.timeoutMs ?? REQUEST_TIMEOUT_MS,
+    ),
     ...(options.body !== undefined
       ? { body: JSON.stringify(options.body) }
       : {}),

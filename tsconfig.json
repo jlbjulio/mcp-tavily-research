@@ -1,7 +1,7 @@
 {
   // Configure how TypeScript checks and compiles the project.
   "compilerOptions": {
-    // Generate modern JavaScript supported by Node.js 20 and later.
+    // Generate modern JavaScript supported by the project's Node.js 22 baseline.
     "target": "ES2022",
 
     // Use Node.js native ES modules.
