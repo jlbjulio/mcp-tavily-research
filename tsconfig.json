@@ -1,0 +1,55 @@
+{
+  // Configure how TypeScript checks and compiles the project.
+  "compilerOptions": {
+    // Generate modern JavaScript supported by Node.js 20 and later.
+    "target": "ES2022",
+
+    // Use Node.js native ES modules.
+    "module": "NodeNext",
+
+    // Resolve imports using Node.js ES module rules.
+    "moduleResolution": "NodeNext",
+
+    // Treat the src directory as the source-code root.
+    "rootDir": "src",
+
+    // Write compiled JavaScript files into dist.
+    "outDir": "dist",
+
+    // Enable TypeScript's strongest standard type checking.
+    "strict": true,
+
+    // Warn when an indexed array or object value could be undefined.
+    "noUncheckedIndexedAccess": true,
+
+    // Preserve the difference between missing and undefined properties.
+    "exactOptionalPropertyTypes": true,
+
+    // Preserve ES module import and export syntax.
+    "verbatimModuleSyntax": true,
+
+    // Prevent JavaScript output when TypeScript finds an error.
+    "noEmitOnError": true,
+
+    // Generate type declaration files for package consumers.
+    "declaration": true,
+
+    // Generate source maps for easier debugging.
+    "sourceMap": true,
+
+    // Include Node.js globals and built-in module types.
+    "types": ["node"],
+
+    // Avoid checking declaration files inside third-party dependencies.
+    "skipLibCheck": true,
+
+    // Reject imports whose filename casing differs between systems.
+    "forceConsistentCasingInFileNames": true
+  },
+
+  // Compile every TypeScript file inside src.
+  "include": ["src/**/*.ts"],
+
+  // Ignore installed dependencies and generated output.
+  "exclude": ["node_modules", "dist"]
+}
