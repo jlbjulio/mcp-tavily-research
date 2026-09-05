@@ -1,19 +1,13 @@
-// Import the MCP server type without creating a runtime dependency.
 import type { McpServer } from "@modelcontextprotocol/server";
-
-// Import Zod to describe and validate tool arguments.
 import * as z from "zod/v4";
 
-// Import the endpoint-specific Crawl client.
-import { crawlWithTavily } from "../clients/tavily-crawl-client.js";
-
-// Import shared Tavily content option values.
 import {
+  crawlWithTavily,
+  getTavilyImageUrl,
   TAVILY_CONTENT_FORMATS,
   TAVILY_EXTRACT_DEPTHS,
-} from "../clients/tavily-content-options.js";
+} from "../clients/tavily-crawl-client.js";
 
-// Accept only absolute HTTP and HTTPS starting URLs.
 const webUrlSchema = z
   .string()
   .trim()
@@ -23,15 +17,11 @@ const webUrlSchema = z
     "URL must use HTTP or HTTPS.",
   );
 
-// Reuse one schema for Tavily's optional regex filter arrays.
 const regexListSchema = z
   .array(z.string().trim().min(1))
   .max(50)
   .optional();
 
-/**
- * Register the Tavily Crawl tool on an MCP server.
- */
 export function registerTavilyCrawlTool(
   server: McpServer,
 ): void {
@@ -40,13 +30,9 @@ export function registerTavilyCrawlTool(
     {
       title: "Tavily Website Crawl",
       description:
-        "Traverse a website from one root URL and extract content from matching pages. Use for documentation sites or multi-page website analysis. Crawl combines mapping and extraction costs, so keep depth, breadth, and limit small unless broader traversal is necessary.",
-
+        "Crawl one website and extract content from matching pages. Keep the limit small to control cost.",
       inputSchema: z.object({
-        url: webUrlSchema.describe(
-          "The absolute HTTP or HTTPS root URL where crawling begins.",
-        ),
-
+        url: webUrlSchema.describe("Root URL."),
         instructions: z
           .string()
           .trim()
@@ -54,101 +40,77 @@ export function registerTavilyCrawlTool(
           .max(2_000)
           .optional()
           .describe(
-            "Optional natural-language guidance for finding relevant pages. Guided mapping costs more.",
+            "Optional natural-language crawl instructions.",
           ),
-
-        chunksPerSource: z
+        chunks_per_source: z
           .number()
           .int()
           .min(1)
           .max(5)
           .default(3)
           .describe(
-            "Relevant chunks per page when instructions are provided. Ignored without instructions.",
+            "Chunks per page when instructions are provided.",
           ),
-
-        maxDepth: z
+        max_depth: z
           .number()
           .int()
           .min(1)
           .max(5)
           .default(1)
-          .describe("Maximum link depth from the root page."),
-
-        maxBreadth: z
+          .describe("Maximum crawl depth."),
+        max_breadth: z
           .number()
           .int()
           .min(1)
           .max(500)
           .default(10)
-          .describe("Maximum links followed from each level."),
-
+          .describe("Maximum links followed per level."),
         limit: z
           .number()
           .int()
           .min(1)
           .max(50)
           .default(10)
-          .describe(
-            "Maximum pages returned. This MCP applies a safety cap of 50.",
-          ),
-
-        selectPaths: regexListSchema.describe(
-          "Optional regex patterns selecting URL paths to include.",
+          .describe("Maximum pages returned."),
+        select_paths: regexListSchema.describe(
+          "Regex patterns for paths to include.",
         ),
-
-        selectDomains: regexListSchema.describe(
-          "Optional regex patterns selecting domains or subdomains to include.",
+        select_domains: regexListSchema.describe(
+          "Regex patterns for domains to include.",
         ),
-
-        excludePaths: regexListSchema.describe(
-          "Optional regex patterns for URL paths to exclude.",
+        exclude_paths: regexListSchema.describe(
+          "Regex patterns for paths to exclude.",
         ),
-
-        excludeDomains: regexListSchema.describe(
-          "Optional regex patterns for domains or subdomains to exclude.",
+        exclude_domains: regexListSchema.describe(
+          "Regex patterns for domains to exclude.",
         ),
-
-        allowExternal: z
+        allow_external: z
           .boolean()
           .default(false)
-          .describe(
-            "Allow pages from external domains in the final results. Disabled by default for scope control.",
-          ),
-
-        includeImages: z
+          .describe("Include external-domain pages."),
+        include_images: z
           .boolean()
           .default(false)
-          .describe("Include image URLs found on crawled pages."),
-
-        extractDepth: z
+          .describe("Include images."),
+        extract_depth: z
           .enum(TAVILY_EXTRACT_DEPTHS)
           .default("basic")
-          .describe(
-            "Basic is cheaper; advanced improves extraction of tables and embedded content.",
-          ),
-
+          .describe("Basic is cheaper; advanced extracts more."),
         format: z
           .enum(TAVILY_CONTENT_FORMATS)
           .default("markdown")
-          .describe("Return page content as Markdown or plain text."),
-
-        includeFavicon: z
+          .describe("Content format."),
+        include_favicon: z
           .boolean()
           .default(false)
-          .describe("Include the favicon URL for each page."),
-
+          .describe("Include favicons."),
         timeout: z
           .number()
           .min(10)
           .max(150)
           .default(30)
-          .describe(
-            "Maximum crawl time in seconds. Values above the MCP client's tool timeout may require client configuration.",
-          ),
+          .describe("Maximum crawl time in seconds."),
       }),
-
-      // Crawling reads external pages without modifying them.
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
@@ -156,58 +118,59 @@ export function registerTavilyCrawlTool(
         openWorldHint: true,
       },
     },
-
     async ({
       url,
       instructions,
-      chunksPerSource,
-      maxDepth,
-      maxBreadth,
+      chunks_per_source,
+      max_depth,
+      max_breadth,
       limit,
-      selectPaths,
-      selectDomains,
-      excludePaths,
-      excludeDomains,
-      allowExternal,
-      includeImages,
-      extractDepth,
+      select_paths,
+      select_domains,
+      exclude_paths,
+      exclude_domains,
+      allow_external,
+      include_images,
+      extract_depth,
       format,
-      includeFavicon,
+      include_favicon,
       timeout,
     }) => {
       try {
         const result = await crawlWithTavily(url, {
-          chunksPerSource,
-          maxDepth,
-          maxBreadth,
+          chunks_per_source,
+          max_depth,
+          max_breadth,
           limit,
-          allowExternal,
-          includeImages,
-          extractDepth,
+          allow_external,
+          include_images,
+          extract_depth,
           format,
-          includeFavicon,
+          include_favicon,
           timeout,
           ...(instructions ? { instructions } : {}),
-          ...(selectPaths ? { selectPaths } : {}),
-          ...(selectDomains ? { selectDomains } : {}),
-          ...(excludePaths ? { excludePaths } : {}),
-          ...(excludeDomains ? { excludeDomains } : {}),
+          ...(select_paths ? { select_paths } : {}),
+          ...(select_domains ? { select_domains } : {}),
+          ...(exclude_paths ? { exclude_paths } : {}),
+          ...(exclude_domains ? { exclude_domains } : {}),
         });
 
-        // Format every crawled page for text-only MCP clients.
-        const formattedPages =
+        const pages =
           result.results.length > 0
             ? result.results
                 .map((page, index) => {
                   const sections = [
                     `[${index + 1}] ${page.url}`,
-                    page.rawContent,
+                    page.raw_content,
                   ];
 
-                  if (page.images.length > 0) {
+                  if (page.images?.length) {
                     sections.push(
                       `Images:\n${page.images
-                        .map((image) => `- ${image.url}`)
+                        .map(
+                          (image) =>
+                            `- ${getTavilyImageUrl(image)}`,
+                        )
                         .join("\n")}`,
                     );
                   }
@@ -224,21 +187,19 @@ export function registerTavilyCrawlTool(
               text: [
                 "Crawled pages",
                 "",
-                formattedPages,
+                pages,
                 "",
                 "Metadata",
                 "",
-                `- Base URL: ${result.baseUrl}`,
+                `- Base URL: ${result.base_url}`,
                 `- Pages returned: ${result.results.length}`,
-                `- Response time: ${result.responseTime} seconds`,
-                `- Credits used: ${result.creditsUsed ?? "unknown"}`,
-                `- Request ID: ${result.requestId}`,
+                `- Response time: ${result.response_time} seconds`,
+                `- Credits used: ${result.usage?.credits ?? "unknown"}`,
+                `- Request ID: ${result.request_id}`,
               ].join("\n"),
             },
           ],
-          structuredContent: {
-            ...result,
-          },
+          structuredContent: result,
         };
       } catch (error) {
         const message =

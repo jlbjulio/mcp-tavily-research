@@ -1,19 +1,13 @@
-// Import the MCP server type without creating a runtime dependency.
 import type { McpServer } from "@modelcontextprotocol/server";
-
-// Import Zod to describe and validate tool arguments.
 import * as z from "zod/v4";
 
-// Import shared Tavily content option values.
 import {
+  extractWithTavily,
+  getTavilyImageUrl,
   TAVILY_CONTENT_FORMATS,
   TAVILY_EXTRACT_DEPTHS,
-} from "../clients/tavily-content-options.js";
+} from "../clients/tavily-extract-client.js";
 
-// Import the endpoint-specific Extract client.
-import { extractWithTavily } from "../clients/tavily-extract-client.js";
-
-// Accept only absolute HTTP and HTTPS URLs at the MCP boundary.
 const webUrlSchema = z
   .string()
   .trim()
@@ -23,9 +17,6 @@ const webUrlSchema = z
     "URL must use HTTP or HTTPS.",
   );
 
-/**
- * Register the Tavily Extract tool on an MCP server.
- */
 export function registerTavilyExtractTool(
   server: McpServer,
 ): void {
@@ -34,71 +25,53 @@ export function registerTavilyExtractTool(
     {
       title: "Tavily Content Extract",
       description:
-        "Extract readable content from one or more known web URLs. Use after discovering specific pages whose full content is needed. Supports up to 20 URLs per call and consumes Extract credits for successful pages.",
-
+        "Extract readable content from up to 20 known web URLs.",
       inputSchema: z.object({
         urls: z
           .union([
             webUrlSchema,
             z.array(webUrlSchema).min(1).max(20),
           ])
-          .describe(
-            "One URL or an array of up to 20 URLs to extract.",
-          ),
-
+          .describe("One URL or an array of up to 20 URLs."),
         query: z
           .string()
           .trim()
           .min(1)
           .max(2_000)
           .optional()
-          .describe(
-            "Optional intent used to rerank and return only relevant content chunks.",
-          ),
-
-        chunksPerSource: z
+          .describe("Optional intent for reranking content."),
+        chunks_per_source: z
           .number()
           .int()
           .min(1)
           .max(5)
           .default(3)
           .describe(
-            "Relevant chunks per URL when query is provided. Ignored without query.",
+            "Chunks per URL when query is provided.",
           ),
-
-        extractDepth: z
+        extract_depth: z
           .enum(TAVILY_EXTRACT_DEPTHS)
           .default("basic")
-          .describe(
-            "Basic is cheaper; advanced improves extraction of tables and embedded content.",
-          ),
-
-        includeImages: z
+          .describe("Basic is cheaper; advanced extracts more."),
+        include_images: z
           .boolean()
           .default(false)
-          .describe("Include image URLs found on each page."),
-
-        includeFavicon: z
+          .describe("Include images."),
+        include_favicon: z
           .boolean()
           .default(false)
-          .describe("Include the favicon URL for each page."),
-
+          .describe("Include favicons."),
         format: z
           .enum(TAVILY_CONTENT_FORMATS)
           .default("markdown")
-          .describe("Return extracted content as Markdown or plain text."),
-
+          .describe("Content format."),
         timeout: z
           .number()
           .min(1)
           .max(60)
           .optional()
-          .describe(
-            "Optional per-URL extraction timeout in seconds. Tavily applies a depth-specific default when omitted.",
-          ),
+          .describe("Extraction timeout in seconds."),
       }),
-
-      // Extraction reads external pages without modifying them.
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
@@ -106,46 +79,46 @@ export function registerTavilyExtractTool(
         openWorldHint: true,
       },
     },
-
     async ({
       urls,
       query,
-      chunksPerSource,
-      extractDepth,
-      includeImages,
-      includeFavicon,
+      chunks_per_source,
+      extract_depth,
+      include_images,
+      include_favicon,
       format,
       timeout,
     }) => {
       try {
-        // Normalize a single URL and an array into the client shape.
-        const normalizedUrls =
-          typeof urls === "string" ? [urls] : urls;
+        const result = await extractWithTavily(
+          typeof urls === "string" ? [urls] : urls,
+          {
+            chunks_per_source,
+            extract_depth,
+            include_images,
+            include_favicon,
+            format,
+            ...(query ? { query } : {}),
+            ...(timeout !== undefined ? { timeout } : {}),
+          },
+        );
 
-        const result = await extractWithTavily(normalizedUrls, {
-          chunksPerSource,
-          extractDepth,
-          includeImages,
-          includeFavicon,
-          format,
-          ...(query ? { query } : {}),
-          ...(timeout !== undefined ? { timeout } : {}),
-        });
-
-        // Format successfully extracted pages for text-only MCP clients.
-        const formattedResults =
+        const pages =
           result.results.length > 0
             ? result.results
                 .map((page, index) => {
                   const sections = [
                     `[${index + 1}] ${page.url}`,
-                    page.rawContent,
+                    page.raw_content,
                   ];
 
-                  if (page.images.length > 0) {
+                  if (page.images?.length) {
                     sections.push(
                       `Images:\n${page.images
-                        .map((image) => `- ${image.url}`)
+                        .map(
+                          (image) =>
+                            `- ${getTavilyImageUrl(image)}`,
+                        )
                         .join("\n")}`,
                     );
                   }
@@ -155,10 +128,10 @@ export function registerTavilyExtractTool(
                 .join("\n\n---\n\n")
             : "No pages were extracted successfully.";
 
-        // Preserve partial failures instead of hiding them.
-        const formattedFailures =
-          result.failedResults.length > 0
-            ? result.failedResults
+        const failed_results = result.failed_results ?? [];
+        const failures =
+          failed_results.length > 0
+            ? failed_results
                 .map(
                   (failure) =>
                     `- ${failure.url}: ${failure.error ?? "No error detail was provided."}`,
@@ -173,25 +146,23 @@ export function registerTavilyExtractTool(
               text: [
                 "Extracted pages",
                 "",
-                formattedResults,
+                pages,
                 "",
                 "Failed pages",
                 "",
-                formattedFailures,
+                failures,
                 "",
                 "Metadata",
                 "",
                 `- Successful pages: ${result.results.length}`,
-                `- Failed pages: ${result.failedResults.length}`,
-                `- Response time: ${result.responseTime} seconds`,
-                `- Credits used: ${result.creditsUsed ?? "unknown"}`,
-                `- Request ID: ${result.requestId}`,
+                `- Failed pages: ${failed_results.length}`,
+                `- Response time: ${result.response_time} seconds`,
+                `- Credits used: ${result.usage?.credits ?? "unknown"}`,
+                `- Request ID: ${result.request_id}`,
               ].join("\n"),
             },
           ],
-          structuredContent: {
-            ...result,
-          },
+          structuredContent: result,
         };
       } catch (error) {
         const message =

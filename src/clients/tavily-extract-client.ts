@@ -1,25 +1,21 @@
-// Import Zod to validate Tavily's external responses at runtime.
 import * as z from "zod/v4";
 
-// Import shared content options and normalization helpers.
-import {
-  normalizeTavilyImage,
-  type TavilyContentFormat,
-  type TavilyExtractDepth,
-  type TavilyImage,
-} from "./tavily-content-options.js";
-
-// Import the shared authenticated HTTP transport.
 import { requestTavilyJson } from "./tavily-http-client.js";
 
-// Store the endpoint path used by the shared HTTP client.
 const TAVILY_EXTRACT_PATH = "/extract";
-
-// Tavily accepts at most twenty URLs in one Extract request.
 const MAX_EXTRACT_URLS = 20;
 
-// Accept both documented image representations from Tavily.
-const imageSchema = z.union([
+export const TAVILY_EXTRACT_DEPTHS = [
+  "basic",
+  "advanced",
+] as const;
+
+export const TAVILY_CONTENT_FORMATS = [
+  "markdown",
+  "text",
+] as const;
+
+const tavilyImageSchema = z.union([
   z.string(),
   z
     .object({
@@ -29,81 +25,62 @@ const imageSchema = z.union([
     .passthrough(),
 ]);
 
-// Validate one successfully extracted page.
-const extractResultSchema = z
-  .object({
-    url: z.string(),
-    raw_content: z.string(),
-    images: z.array(imageSchema).optional(),
-    favicon: z.string().nullable().optional(),
-  })
-  .passthrough();
+type TavilyImage = z.infer<typeof tavilyImageSchema>;
 
-// Validate one URL that Tavily could not extract.
-const failedExtractResultSchema = z
-  .object({
-    url: z.string(),
-    error: z.string().nullable().optional(),
-  })
-  .passthrough();
+export function getTavilyImageUrl(
+  image: TavilyImage,
+): string {
+  return typeof image === "string" ? image : image.url;
+}
 
-// Validate the complete Extract response used by this project.
 const extractResponseSchema = z
   .object({
-    results: z.array(extractResultSchema),
-    failed_results: z.array(failedExtractResultSchema).optional(),
+    results: z.array(
+      z
+        .object({
+          url: z.string(),
+          raw_content: z.string(),
+          images: z.array(tavilyImageSchema).optional(),
+          favicon: z.string().nullable().optional(),
+        })
+        .passthrough(),
+    ),
+    failed_results: z
+      .array(
+        z
+          .object({
+            url: z.string(),
+            error: z.string().nullable().optional(),
+          })
+          .passthrough(),
+      )
+      .optional(),
     response_time: z.union([z.string(), z.number()]),
     usage: z
-      .object({
-        credits: z.number(),
-      })
+      .object({ credits: z.number() })
       .nullish(),
     request_id: z.string(),
   })
   .passthrough();
 
-// Describe optional Tavily Extract settings.
 export interface TavilyExtractOptions {
   query?: string;
-  chunksPerSource?: number;
-  extractDepth?: TavilyExtractDepth;
-  includeImages?: boolean;
-  includeFavicon?: boolean;
-  format?: TavilyContentFormat;
+  chunks_per_source?: number;
+  extract_depth?: (typeof TAVILY_EXTRACT_DEPTHS)[number];
+  include_images?: boolean;
+  include_favicon?: boolean;
+  format?: (typeof TAVILY_CONTENT_FORMATS)[number];
   timeout?: number;
 }
 
-// Describe one normalized successful extraction.
-export interface TavilyExtractResult {
-  url: string;
-  rawContent: string;
-  images: TavilyImage[];
-  favicon: string | null;
-}
+export type TavilyExtractResponse = z.infer<
+  typeof extractResponseSchema
+>;
 
-// Describe one normalized failed extraction.
-export interface TavilyFailedExtractResult {
-  url: string;
-  error: string | null;
-}
-
-// Describe the normalized Extract response returned to the MCP layer.
-export interface TavilyExtractResponse {
-  results: TavilyExtractResult[];
-  failedResults: TavilyFailedExtractResult[];
-  responseTime: string;
-  creditsUsed: number | null;
-  requestId: string;
-}
-
-/**
- * Extract readable content from one or more known web URLs.
- */
 export async function extractWithTavily(
   urls: string[],
   options: TavilyExtractOptions = {},
 ): Promise<TavilyExtractResponse> {
-  // Normalize copied URLs before validating or sending them.
   const normalizedUrls = urls.map((url) => url.trim());
 
   if (
@@ -115,7 +92,6 @@ export async function extractWithTavily(
     );
   }
 
-  // Accept only absolute HTTP and HTTPS URLs.
   for (const url of normalizedUrls) {
     let parsedUrl: URL;
 
@@ -126,80 +102,46 @@ export async function extractWithTavily(
     }
 
     if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-      throw new Error(`Only HTTP and HTTPS URLs are supported: ${url}`);
+      throw new Error(
+        `Only HTTP and HTTPS URLs are supported: ${url}`,
+      );
     }
   }
 
-  // Normalize the optional relevance query.
-  const normalizedQuery = options.query?.trim();
+  const query = options.query?.trim();
+  const extract_depth = options.extract_depth ?? "basic";
 
-  // Choose defaults that keep extraction predictable and inexpensive.
-  const extractDepth = options.extractDepth ?? "basic";
-  const format = options.format ?? "markdown";
-
-  // Build the JSON body expected by Tavily Extract.
   const requestBody = {
     urls: normalizedUrls,
-    extract_depth: extractDepth,
-    include_images: options.includeImages ?? false,
-    include_favicon: options.includeFavicon ?? false,
-    format,
+    extract_depth,
+    include_images: options.include_images ?? false,
+    include_favicon: options.include_favicon ?? false,
+    format: options.format ?? "markdown",
     include_usage: true,
-
-    // Reranking and chunk limits apply only when a query is provided.
-    ...(normalizedQuery
+    ...(query
       ? {
-          query: normalizedQuery,
-          chunks_per_source: options.chunksPerSource ?? 3,
+          query,
+          chunks_per_source:
+            options.chunks_per_source ?? 3,
         }
       : {}),
-
-    // Let Tavily apply its depth-specific timeout when omitted.
     ...(options.timeout !== undefined
       ? { timeout: options.timeout }
       : {}),
   };
 
-  // Allow a small transport margin beyond Tavily's extraction timeout.
   const apiTimeoutSeconds =
-    options.timeout ?? (extractDepth === "advanced" ? 30 : 10);
+    options.timeout ??
+    (extract_depth === "advanced" ? 30 : 10);
 
-  const responseData = await requestTavilyJson(
+  return requestTavilyJson(
     TAVILY_EXTRACT_PATH,
     {
       method: "POST",
       body: requestBody,
-      timeoutMs: (apiTimeoutSeconds + 5) * 1_000,
+      timeout_ms: (apiTimeoutSeconds + 5) * 1_000,
     },
+    extractResponseSchema,
+    "Extract",
   );
-
-  // Never trust an external response before runtime validation.
-  const validationResult =
-    extractResponseSchema.safeParse(responseData);
-
-  if (!validationResult.success) {
-    throw new Error(
-      "Tavily API returned an unexpected Extract response format.",
-    );
-  }
-
-  const data = validationResult.data;
-
-  // Convert Tavily's response into consistent camelCase properties.
-  return {
-    results: data.results.map((result) => ({
-      url: result.url,
-      rawContent: result.raw_content,
-      images: (result.images ?? []).map(normalizeTavilyImage),
-      favicon: result.favicon ?? null,
-    })),
-    failedResults:
-      data.failed_results?.map((result) => ({
-        url: result.url,
-        error: result.error ?? null,
-      })) ?? [],
-    responseTime: String(data.response_time),
-    creditsUsed: data.usage?.credits ?? null,
-    requestId: data.request_id,
-  };
 }

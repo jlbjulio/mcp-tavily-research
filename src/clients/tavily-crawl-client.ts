@@ -1,25 +1,21 @@
-// Import Zod to validate Tavily's external responses at runtime.
 import * as z from "zod/v4";
 
-// Import shared content options and normalization helpers.
-import {
-  normalizeTavilyImage,
-  type TavilyContentFormat,
-  type TavilyExtractDepth,
-  type TavilyImage,
-} from "./tavily-content-options.js";
-
-// Import the shared authenticated HTTP transport.
 import { requestTavilyJson } from "./tavily-http-client.js";
 
-// Store the endpoint path used by the shared HTTP client.
 const TAVILY_CRAWL_PATH = "/crawl";
-
-// Use a conservative project-level cap to control output and credit usage.
 const MAX_CRAWL_RESULTS = 50;
 
-// Accept both documented image representations from Tavily.
-const imageSchema = z.union([
+export const TAVILY_EXTRACT_DEPTHS = [
+  "basic",
+  "advanced",
+] as const;
+
+export const TAVILY_CONTENT_FORMATS = [
+  "markdown",
+  "text",
+] as const;
+
+const tavilyImageSchema = z.union([
   z.string(),
   z
     .object({
@@ -29,75 +25,61 @@ const imageSchema = z.union([
     .passthrough(),
 ]);
 
-// Validate one page returned by a crawl.
-const crawlResultSchema = z
-  .object({
-    url: z.string(),
-    raw_content: z.string(),
-    images: z.array(imageSchema).optional(),
-    favicon: z.string().nullable().optional(),
-  })
-  .passthrough();
+type TavilyImage = z.infer<typeof tavilyImageSchema>;
 
-// Validate the complete Crawl response used by this project.
+export function getTavilyImageUrl(
+  image: TavilyImage,
+): string {
+  return typeof image === "string" ? image : image.url;
+}
+
 const crawlResponseSchema = z
   .object({
     base_url: z.string(),
-    results: z.array(crawlResultSchema),
+    results: z.array(
+      z
+        .object({
+          url: z.string(),
+          raw_content: z.string(),
+          images: z.array(tavilyImageSchema).optional(),
+          favicon: z.string().nullable().optional(),
+        })
+        .passthrough(),
+    ),
     response_time: z.union([z.string(), z.number()]),
     usage: z
-      .object({
-        credits: z.number(),
-      })
+      .object({ credits: z.number() })
       .nullish(),
     request_id: z.string(),
   })
   .passthrough();
 
-// Describe optional Tavily Crawl settings.
 export interface TavilyCrawlOptions {
   instructions?: string;
-  chunksPerSource?: number;
-  maxDepth?: number;
-  maxBreadth?: number;
+  chunks_per_source?: number;
+  max_depth?: number;
+  max_breadth?: number;
   limit?: number;
-  selectPaths?: string[];
-  selectDomains?: string[];
-  excludePaths?: string[];
-  excludeDomains?: string[];
-  allowExternal?: boolean;
-  includeImages?: boolean;
-  extractDepth?: TavilyExtractDepth;
-  format?: TavilyContentFormat;
-  includeFavicon?: boolean;
+  select_paths?: string[];
+  select_domains?: string[];
+  exclude_paths?: string[];
+  exclude_domains?: string[];
+  allow_external?: boolean;
+  include_images?: boolean;
+  extract_depth?: (typeof TAVILY_EXTRACT_DEPTHS)[number];
+  format?: (typeof TAVILY_CONTENT_FORMATS)[number];
+  include_favicon?: boolean;
   timeout?: number;
 }
 
-// Describe one normalized crawled page.
-export interface TavilyCrawlResult {
-  url: string;
-  rawContent: string;
-  images: TavilyImage[];
-  favicon: string | null;
-}
+export type TavilyCrawlResponse = z.infer<
+  typeof crawlResponseSchema
+>;
 
-// Describe the normalized Crawl response returned to the MCP layer.
-export interface TavilyCrawlResponse {
-  baseUrl: string;
-  results: TavilyCrawlResult[];
-  responseTime: string;
-  creditsUsed: number | null;
-  requestId: string;
-}
-
-/**
- * Traverse a website and extract content from matching pages.
- */
 export async function crawlWithTavily(
   url: string,
   options: TavilyCrawlOptions = {},
 ): Promise<TavilyCrawlResponse> {
-  // Normalize and validate the starting URL.
   const normalizedUrl = url.trim();
   let parsedUrl: URL;
 
@@ -111,12 +93,7 @@ export async function crawlWithTavily(
     throw new Error("The root URL must use HTTP or HTTPS.");
   }
 
-  // Apply conservative defaults suitable for an MCP response.
-  const maxDepth = options.maxDepth ?? 1;
-  const maxBreadth = options.maxBreadth ?? 10;
   const limit = options.limit ?? 10;
-  const timeout = options.timeout ?? 30;
-  const normalizedInstructions = options.instructions?.trim();
 
   if (limit > MAX_CRAWL_RESULTS) {
     throw new Error(
@@ -124,76 +101,50 @@ export async function crawlWithTavily(
     );
   }
 
-  // Build the JSON body expected by Tavily Crawl.
+  const instructions = options.instructions?.trim();
+  const timeout = options.timeout ?? 30;
+
   const requestBody = {
     url: normalizedUrl,
-    max_depth: maxDepth,
-    max_breadth: maxBreadth,
+    max_depth: options.max_depth ?? 1,
+    max_breadth: options.max_breadth ?? 10,
     limit,
-    allow_external: options.allowExternal ?? false,
-    include_images: options.includeImages ?? false,
-    extract_depth: options.extractDepth ?? "basic",
+    allow_external: options.allow_external ?? false,
+    include_images: options.include_images ?? false,
+    extract_depth: options.extract_depth ?? "basic",
     format: options.format ?? "markdown",
-    include_favicon: options.includeFavicon ?? false,
+    include_favicon: options.include_favicon ?? false,
     timeout,
     include_usage: true,
-
-    // Natural-language instructions activate Tavily's guided mapping.
-    ...(normalizedInstructions
+    ...(instructions
       ? {
-          instructions: normalizedInstructions,
-          chunks_per_source: options.chunksPerSource ?? 3,
+          instructions,
+          chunks_per_source:
+            options.chunks_per_source ?? 3,
         }
       : {}),
-
-    // Add optional regex filters only when they contain entries.
-    ...(options.selectPaths?.length
-      ? { select_paths: options.selectPaths }
+    ...(options.select_paths?.length
+      ? { select_paths: options.select_paths }
       : {}),
-    ...(options.selectDomains?.length
-      ? { select_domains: options.selectDomains }
+    ...(options.select_domains?.length
+      ? { select_domains: options.select_domains }
       : {}),
-    ...(options.excludePaths?.length
-      ? { exclude_paths: options.excludePaths }
+    ...(options.exclude_paths?.length
+      ? { exclude_paths: options.exclude_paths }
       : {}),
-    ...(options.excludeDomains?.length
-      ? { exclude_domains: options.excludeDomains }
+    ...(options.exclude_domains?.length
+      ? { exclude_domains: options.exclude_domains }
       : {}),
   };
 
-  // Allow a small transport margin beyond Tavily's crawl timeout.
-  const responseData = await requestTavilyJson(
+  return requestTavilyJson(
     TAVILY_CRAWL_PATH,
     {
       method: "POST",
       body: requestBody,
-      timeoutMs: (timeout + 5) * 1_000,
+      timeout_ms: (timeout + 5) * 1_000,
     },
+    crawlResponseSchema,
+    "Crawl",
   );
-
-  // Never trust an external response before runtime validation.
-  const validationResult =
-    crawlResponseSchema.safeParse(responseData);
-
-  if (!validationResult.success) {
-    throw new Error(
-      "Tavily API returned an unexpected Crawl response format.",
-    );
-  }
-
-  const data = validationResult.data;
-
-  // Convert Tavily's response into consistent camelCase properties.
-  return {
-    baseUrl: data.base_url,
-    results: data.results.map((result) => ({
-      url: result.url,
-      rawContent: result.raw_content,
-      images: (result.images ?? []).map(normalizeTavilyImage),
-      favicon: result.favicon ?? null,
-    })),
-    responseTime: String(data.response_time),
-    creditsUsed: data.usage?.credits ?? null,
-    requestId: data.request_id,
-  };
 }
