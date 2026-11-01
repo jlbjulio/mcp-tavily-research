@@ -1,0 +1,1652 @@
+[
+  {
+    "name": "search_full",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"  rust mcp  \",\"search_depth\":\"advanced\",\"topic\":\"news\",\"time_range\":\"week\",\"max_results\":20,\"include_domains\":[\"a.example\",\"b.example\"],\"exclude_domains\":[\"c.example\"],\"include_answer\":\"advanced\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-search-1\",\"query\":\"rust mcp\",\"follow_up_questions\":null,\"answer\":\"Rust MCP servers use rmcp.\",\"images\":[],\"results\":[{\"url\":\"https://a.example/one\",\"title\":\"One\",\"content\":\"First content\",\"score\":0.98765,\"raw_content\":null,\"favicon\":\"https://a.example/f.ico\",\"extra_field\":{\"nested\":[1,2.5,true]}},{\"title\":\"Two\",\"url\":\"https://b.example/two\",\"content\":\"Second\\nmultiline\",\"score\":0.0625},{\"title\":\"Three\",\"url\":\"https://c.example\",\"content\":\"\",\"score\":1}],\"response_time\":1.5,\"usage\":{\"credits\":1,\"breakdown\":{\"search\":1}}}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"rust mcp\",\"search_depth\":\"advanced\",\"topic\":\"news\",\"max_results\":20,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":\"advanced\",\"time_range\":\"week\",\"include_domains\":[\"a.example\",\"b.example\"],\"exclude_domains\":[\"c.example\"]}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Answer\\n\\nRust MCP servers use rmcp.\\n\\nSources\\n\\n[1] One\\nURL: https://a.example/one\\nRelevance score: 0.988\\nFirst content\\n\\n[2] Two\\nURL: https://b.example/two\\nRelevance score: 0.063\\nSecond\\nmultiline\\n\\n[3] Three\\nURL: https://c.example\\nRelevance score: 1.000\\n\\n\\nMetadata\\n\\n- Query: rust mcp\\n- Response time: 1.5 seconds\\n- Credits used: 1\\n- Request ID: req-search-1\"}],\"structuredContent\":{\"query\":\"rust mcp\",\"answer\":\"Rust MCP servers use rmcp.\",\"results\":[{\"title\":\"One\",\"url\":\"https://a.example/one\",\"content\":\"First content\",\"score\":0.98765,\"raw_content\":null,\"favicon\":\"https://a.example/f.ico\",\"extra_field\":{\"nested\":[1,2.5,true]}},{\"title\":\"Two\",\"url\":\"https://b.example/two\",\"content\":\"Second\\nmultiline\",\"score\":0.0625},{\"title\":\"Three\",\"url\":\"https://c.example\",\"content\":\"\",\"score\":1}],\"response_time\":1.5,\"request_id\":\"req-search-1\",\"usage\":{\"credits\":1},\"follow_up_questions\":null,\"images\":[]},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_defaults_empty_results",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"nothing\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"query\":\"nothing\",\"answer\":null,\"results\":[],\"response_time\":\"2.10\",\"request_id\":\"r2\",\"usage\":null}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"nothing\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Sources\\n\\nNo sources were returned.\\n\\nMetadata\\n\\n- Query: nothing\\n- Response time: 2.10 seconds\\n- Credits used: unknown\\n- Request ID: r2\"}],\"structuredContent\":{\"query\":\"nothing\",\"answer\":null,\"results\":[],\"response_time\":\"2.10\",\"request_id\":\"r2\",\"usage\":null},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_empty_answer_no_usage",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"include_domains\":[],\"exclude_domains\":[]}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"query\":\"q\",\"answer\":\"\",\"results\":[{\"title\":\"T\",\"url\":\"https://t.example\",\"content\":\"c\",\"score\":0.1}],\"response_time\":3,\"request_id\":\"r3\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Sources\\n\\n[1] T\\nURL: https://t.example\\nRelevance score: 0.100\\nc\\n\\nMetadata\\n\\n- Query: q\\n- Response time: 3 seconds\\n- Credits used: unknown\\n- Request ID: r3\"}],\"structuredContent\":{\"query\":\"q\",\"answer\":\"\",\"results\":[{\"title\":\"T\",\"url\":\"https://t.example\",\"content\":\"c\",\"score\":0.1}],\"response_time\":3,\"request_id\":\"r3\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_integral_float",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"max_results\":8.0}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"query\":\"q\",\"results\":[{\"title\":\"T\",\"url\":\"u\",\"content\":\"c\",\"score\":0.5}],\"response_time\":1.0,\"request_id\":\"r4\",\"usage\":{\"credits\":1.0}}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Sources\\n\\n[1] T\\nURL: u\\nRelevance score: 0.500\\nc\\n\\nMetadata\\n\\n- Query: q\\n- Response time: 1 seconds\\n- Credits used: 1\\n- Request ID: r4\"}],\"structuredContent\":{\"query\":\"q\",\"results\":[{\"title\":\"T\",\"url\":\"u\",\"content\":\"c\",\"score\":0.5}],\"response_time\":1,\"request_id\":\"r4\",\"usage\":{\"credits\":1}},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_unknown_arg_ignored",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"foo\":\"bar\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"query\":\"q\",\"results\":[],\"response_time\":1,\"request_id\":\"r5\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Sources\\n\\nNo sources were returned.\\n\\nMetadata\\n\\n- Query: q\\n- Response time: 1 seconds\\n- Credits used: unknown\\n- Request ID: r5\"}],\"structuredContent\":{\"query\":\"q\",\"results\":[],\"response_time\":1,\"request_id\":\"r5\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_bad_shape",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"query\":\"q\",\"response_time\":1,\"request_id\":\"r6\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily search failed: Tavily API returned an unexpected Search response.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_bad_score_type",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"query\":\"q\",\"results\":[{\"title\":\"T\",\"url\":\"u\",\"content\":\"c\",\"score\":\"high\"}],\"response_time\":1,\"request_id\":\"r7\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily search failed: Tavily API returned an unexpected Search response.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_http_401_long",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 401,
+      "statusText": "Unauthorized",
+      "body": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ😀tail"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily search failed: Tavily API returned HTTP 401: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxñ😀ñ😀ñ😀ñ😀ñ😀ñ😀ñ\\ud83d\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_http_500_empty",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 500,
+      "statusText": "Internal Server Error",
+      "body": ""
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily search failed: Tavily API returned HTTP 500: Internal Server Error\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_not_json",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "<html>oops</html>"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily search failed: Tavily API returned a response that was not valid JSON.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_network_error",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "error": "network"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily search failed: Tavily request failed: fetch failed\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_timeout",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "error": "timeout"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily search failed: Tavily request failed: The operation was aborted due to timeout\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_missing_key",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "   ",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily search failed: TAVILY_API_KEY is required. Configure it before calling a Tavily tool.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_score_rounding",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"query\":\"q\",\"results\":[{\"title\":\"T0\",\"url\":\"u0\",\"content\":\"c\",\"score\":0.0005},{\"title\":\"T1\",\"url\":\"u1\",\"content\":\"c\",\"score\":0.0015},{\"title\":\"T2\",\"url\":\"u2\",\"content\":\"c\",\"score\":0.1235},{\"title\":\"T3\",\"url\":\"u3\",\"content\":\"c\",\"score\":0.9995},{\"title\":\"T4\",\"url\":\"u4\",\"content\":\"c\",\"score\":2.675},{\"title\":\"T5\",\"url\":\"u5\",\"content\":\"c\",\"score\":1e-7},{\"title\":\"T6\",\"url\":\"u6\",\"content\":\"c\",\"score\":123.4565}],\"response_time\":0.000001,\"request_id\":\"r8\",\"usage\":{\"credits\":0}}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Sources\\n\\n[1] T0\\nURL: u0\\nRelevance score: 0.001\\nc\\n\\n[2] T1\\nURL: u1\\nRelevance score: 0.002\\nc\\n\\n[3] T2\\nURL: u2\\nRelevance score: 0.123\\nc\\n\\n[4] T3\\nURL: u3\\nRelevance score: 1.000\\nc\\n\\n[5] T4\\nURL: u4\\nRelevance score: 2.675\\nc\\n\\n[6] T5\\nURL: u5\\nRelevance score: 0.000\\nc\\n\\n[7] T6\\nURL: u6\\nRelevance score: 123.457\\nc\\n\\nMetadata\\n\\n- Query: q\\n- Response time: 0.000001 seconds\\n- Credits used: 0\\n- Request ID: r8\"}],\"structuredContent\":{\"query\":\"q\",\"results\":[{\"title\":\"T0\",\"url\":\"u0\",\"content\":\"c\",\"score\":0.0005},{\"title\":\"T1\",\"url\":\"u1\",\"content\":\"c\",\"score\":0.0015},{\"title\":\"T2\",\"url\":\"u2\",\"content\":\"c\",\"score\":0.1235},{\"title\":\"T3\",\"url\":\"u3\",\"content\":\"c\",\"score\":0.9995},{\"title\":\"T4\",\"url\":\"u4\",\"content\":\"c\",\"score\":2.675},{\"title\":\"T5\",\"url\":\"u5\",\"content\":\"c\",\"score\":1e-7},{\"title\":\"T6\",\"url\":\"u6\",\"content\":\"c\",\"score\":123.4565}],\"response_time\":0.000001,\"request_id\":\"r8\",\"usage\":{\"credits\":0}},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_missing_query",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: query: Invalid input: expected string, received undefined\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_query_number",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":5}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: query: Invalid input: expected string, received number\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_query_blank",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"   \"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: query: Too small: expected string to have >=1 characters\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_query_too_long",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: query: Too big: expected string to have <=2000 characters\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_bad_enum",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"search_depth\":\"deep\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: search_depth: Invalid option: expected one of \\\"basic\\\"|\\\"advanced\\\"\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_max_results_0",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"max_results\":0}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: max_results: Too small: expected number to be >=1\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_max_results_21",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"max_results\":21}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: max_results: Too big: expected number to be <=20\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_max_results_float",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"max_results\":2.5}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: max_results: Invalid input: expected int, received number\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_max_results_string",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"max_results\":\"8\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: max_results: Invalid input: expected number, received string\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_domains_too_many",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"include_domains\":[\"d0.com\",\"d1.com\",\"d2.com\",\"d3.com\",\"d4.com\",\"d5.com\",\"d6.com\",\"d7.com\",\"d8.com\",\"d9.com\",\"d10.com\",\"d11.com\",\"d12.com\",\"d13.com\",\"d14.com\",\"d15.com\",\"d16.com\",\"d17.com\",\"d18.com\",\"d19.com\",\"d20.com\",\"d21.com\",\"d22.com\",\"d23.com\",\"d24.com\",\"d25.com\",\"d26.com\",\"d27.com\",\"d28.com\",\"d29.com\",\"d30.com\",\"d31.com\",\"d32.com\",\"d33.com\",\"d34.com\",\"d35.com\",\"d36.com\",\"d37.com\",\"d38.com\",\"d39.com\",\"d40.com\",\"d41.com\",\"d42.com\",\"d43.com\",\"d44.com\",\"d45.com\",\"d46.com\",\"d47.com\",\"d48.com\",\"d49.com\",\"d50.com\",\"d51.com\",\"d52.com\",\"d53.com\",\"d54.com\",\"d55.com\",\"d56.com\",\"d57.com\",\"d58.com\",\"d59.com\",\"d60.com\",\"d61.com\",\"d62.com\",\"d63.com\",\"d64.com\",\"d65.com\",\"d66.com\",\"d67.com\",\"d68.com\",\"d69.com\",\"d70.com\",\"d71.com\",\"d72.com\",\"d73.com\",\"d74.com\",\"d75.com\",\"d76.com\",\"d77.com\",\"d78.com\",\"d79.com\",\"d80.com\",\"d81.com\",\"d82.com\",\"d83.com\",\"d84.com\",\"d85.com\",\"d86.com\",\"d87.com\",\"d88.com\",\"d89.com\",\"d90.com\",\"d91.com\",\"d92.com\",\"d93.com\",\"d94.com\",\"d95.com\",\"d96.com\",\"d97.com\",\"d98.com\",\"d99.com\",\"d100.com\",\"d101.com\",\"d102.com\",\"d103.com\",\"d104.com\",\"d105.com\",\"d106.com\",\"d107.com\",\"d108.com\",\"d109.com\",\"d110.com\",\"d111.com\",\"d112.com\",\"d113.com\",\"d114.com\",\"d115.com\",\"d116.com\",\"d117.com\",\"d118.com\",\"d119.com\",\"d120.com\",\"d121.com\",\"d122.com\",\"d123.com\",\"d124.com\",\"d125.com\",\"d126.com\",\"d127.com\",\"d128.com\",\"d129.com\",\"d130.com\",\"d131.com\",\"d132.com\",\"d133.com\",\"d134.com\",\"d135.com\",\"d136.com\",\"d137.com\",\"d138.com\",\"d139.com\",\"d140.com\",\"d141.com\",\"d142.com\",\"d143.com\",\"d144.com\",\"d145.com\",\"d146.com\",\"d147.com\",\"d148.com\",\"d149.com\",\"d150.com\",\"d151.com\",\"d152.com\",\"d153.com\",\"d154.com\",\"d155.com\",\"d156.com\",\"d157.com\",\"d158.com\",\"d159.com\",\"d160.com\",\"d161.com\",\"d162.com\",\"d163.com\",\"d164.com\",\"d165.com\",\"d166.com\",\"d167.com\",\"d168.com\",\"d169.com\",\"d170.com\",\"d171.com\",\"d172.com\",\"d173.com\",\"d174.com\",\"d175.com\",\"d176.com\",\"d177.com\",\"d178.com\",\"d179.com\",\"d180.com\",\"d181.com\",\"d182.com\",\"d183.com\",\"d184.com\",\"d185.com\",\"d186.com\",\"d187.com\",\"d188.com\",\"d189.com\",\"d190.com\",\"d191.com\",\"d192.com\",\"d193.com\",\"d194.com\",\"d195.com\",\"d196.com\",\"d197.com\",\"d198.com\",\"d199.com\",\"d200.com\",\"d201.com\",\"d202.com\",\"d203.com\",\"d204.com\",\"d205.com\",\"d206.com\",\"d207.com\",\"d208.com\",\"d209.com\",\"d210.com\",\"d211.com\",\"d212.com\",\"d213.com\",\"d214.com\",\"d215.com\",\"d216.com\",\"d217.com\",\"d218.com\",\"d219.com\",\"d220.com\",\"d221.com\",\"d222.com\",\"d223.com\",\"d224.com\",\"d225.com\",\"d226.com\",\"d227.com\",\"d228.com\",\"d229.com\",\"d230.com\",\"d231.com\",\"d232.com\",\"d233.com\",\"d234.com\",\"d235.com\",\"d236.com\",\"d237.com\",\"d238.com\",\"d239.com\",\"d240.com\",\"d241.com\",\"d242.com\",\"d243.com\",\"d244.com\",\"d245.com\",\"d246.com\",\"d247.com\",\"d248.com\",\"d249.com\",\"d250.com\",\"d251.com\",\"d252.com\",\"d253.com\",\"d254.com\",\"d255.com\",\"d256.com\",\"d257.com\",\"d258.com\",\"d259.com\",\"d260.com\",\"d261.com\",\"d262.com\",\"d263.com\",\"d264.com\",\"d265.com\",\"d266.com\",\"d267.com\",\"d268.com\",\"d269.com\",\"d270.com\",\"d271.com\",\"d272.com\",\"d273.com\",\"d274.com\",\"d275.com\",\"d276.com\",\"d277.com\",\"d278.com\",\"d279.com\",\"d280.com\",\"d281.com\",\"d282.com\",\"d283.com\",\"d284.com\",\"d285.com\",\"d286.com\",\"d287.com\",\"d288.com\",\"d289.com\",\"d290.com\",\"d291.com\",\"d292.com\",\"d293.com\",\"d294.com\",\"d295.com\",\"d296.com\",\"d297.com\",\"d298.com\",\"d299.com\",\"d300.com\"]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: include_domains: Too big: expected array to have <=300 items\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_domain_blank",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"exclude_domains\":[\"ok.com\",\"  \"]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: exclude_domains.1: Too small: expected string to have >=1 characters\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_domains_not_array",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"include_domains\":\"a.com\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: include_domains: Invalid input: expected array, received string\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_multi",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"topic\":\"sports\",\"max_results\":99,\"include_answer\":true}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: query: Invalid input: expected string, received undefined, topic: Invalid option: expected one of \\\"general\\\"|\\\"news\\\"|\\\"finance\\\", max_results: Too big: expected number to be <=20, include_answer: Invalid option: expected one of \\\"basic\\\"|\\\"advanced\\\"\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_null_query",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":null}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: query: Invalid input: expected string, received null\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_no_arguments",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": null,
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: query: Invalid input: expected string, received undefined\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_time_range_null",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"time_range\":null}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: time_range: Invalid option: expected one of \\\"day\\\"|\\\"week\\\"|\\\"month\\\"|\\\"year\\\"\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_int_and_range",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"max_results\":25.5}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: max_results: Invalid input: expected int, received number\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_negative_float",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"max_results\":-3.5}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: max_results: Invalid input: expected int, received number\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_huge_int",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"max_results\":1e20}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: max_results: Too big: expected int to be <=9007199254740991, max_results: Too big: expected number to be <=20\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_huge_negative_int",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"max_results\":-1e20}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: max_results: Too small: expected int to be >=-9007199254740991, max_results: Too small: expected number to be >=1\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_unsafe_int",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"max_results\":9007199254740993}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: max_results: Too big: expected int to be <=9007199254740991, max_results: Too big: expected number to be <=20\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_crawl_huge_timeout",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"https://d.example\",\"timeout\":1e300}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_crawl: timeout: Too big: expected number to be <=150\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_items_and_length",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\",\"exclude_domains\":[\"d0.com\",\"d1.com\",\"d2.com\",\"d3.com\",\"d4.com\",\"d5.com\",\"d6.com\",\"d7.com\",\"d8.com\",\"d9.com\",\"d10.com\",\"d11.com\",\"d12.com\",\"d13.com\",\"d14.com\",\"d15.com\",\"d16.com\",\"d17.com\",\"d18.com\",\"d19.com\",\"d20.com\",\"d21.com\",\"d22.com\",\"d23.com\",\"d24.com\",\"d25.com\",\"d26.com\",\"d27.com\",\"d28.com\",\"d29.com\",\"d30.com\",\"d31.com\",\"d32.com\",\"d33.com\",\"d34.com\",\"d35.com\",\"d36.com\",\"d37.com\",\"d38.com\",\"d39.com\",\"d40.com\",\"d41.com\",\"d42.com\",\"d43.com\",\"d44.com\",\"d45.com\",\"d46.com\",\"d47.com\",\"d48.com\",\"d49.com\",\"d50.com\",\"d51.com\",\"d52.com\",\"d53.com\",\"d54.com\",\"d55.com\",\"d56.com\",\"d57.com\",\"d58.com\",\"d59.com\",\"d60.com\",\"d61.com\",\"d62.com\",\"d63.com\",\"d64.com\",\"d65.com\",\"d66.com\",\"d67.com\",\"d68.com\",\"d69.com\",\"d70.com\",\"d71.com\",\"d72.com\",\"d73.com\",\"d74.com\",\"d75.com\",\"d76.com\",\"d77.com\",\"d78.com\",\"d79.com\",\"d80.com\",\"d81.com\",\"d82.com\",\"d83.com\",\"d84.com\",\"d85.com\",\"d86.com\",\"d87.com\",\"d88.com\",\"d89.com\",\"d90.com\",\"d91.com\",\"d92.com\",\"d93.com\",\"d94.com\",\"d95.com\",\"d96.com\",\"d97.com\",\"d98.com\",\"d99.com\",\"d100.com\",\"d101.com\",\"d102.com\",\"d103.com\",\"d104.com\",\"d105.com\",\"d106.com\",\"d107.com\",\"d108.com\",\"d109.com\",\"d110.com\",\"d111.com\",\"d112.com\",\"d113.com\",\"d114.com\",\"d115.com\",\"d116.com\",\"d117.com\",\"d118.com\",\"d119.com\",\"d120.com\",\"d121.com\",\"d122.com\",\"d123.com\",\"d124.com\",\"d125.com\",\"d126.com\",\"d127.com\",\"d128.com\",\"d129.com\",\"d130.com\",\"d131.com\",\"d132.com\",\"d133.com\",\"d134.com\",\"d135.com\",\"d136.com\",\"d137.com\",\"d138.com\",\"d139.com\",\"d140.com\",\"d141.com\",\"d142.com\",\"d143.com\",\"d144.com\",\"d145.com\",\"d146.com\",\"d147.com\",\"d148.com\",\"d149.com\",\"\",5]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: exclude_domains.150: Too small: expected string to have >=1 characters, exclude_domains.151: Invalid input: expected string, received number, exclude_domains: Too big: expected array to have <=150 items\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_all_wrong_types",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":[],\"search_depth\":1,\"topic\":null,\"time_range\":{},\"max_results\":true,\"include_domains\":{},\"exclude_domains\":null,\"include_answer\":\"\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: query: Invalid input: expected string, received array, query: Too small: expected array to have >=1 items, search_depth: Invalid option: expected one of \\\"basic\\\"|\\\"advanced\\\", topic: Invalid option: expected one of \\\"general\\\"|\\\"news\\\"|\\\"finance\\\", time_range: Invalid option: expected one of \\\"day\\\"|\\\"week\\\"|\\\"month\\\"|\\\"year\\\", max_results: Invalid input: expected number, received boolean, include_domains: Invalid input: expected array, received object, exclude_domains: Invalid input: expected array, received null, include_answer: Invalid option: expected one of \\\"basic\\\"|\\\"advanced\\\"\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_unicode_length",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily search failed: Tavily request failed: golden: unexpected fetch\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_search_js_whitespace",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\" ﻿ 　\\t\\n\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_search: query: Too small: expected string to have >=1 characters\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_nel_not_trimmed",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"query\":\"q\",\"results\":[],\"response_time\":1,\"request_id\":\"nel\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Sources\\n\\nNo sources were returned.\\n\\nMetadata\\n\\n- Query: q\\n- Response time: 1 seconds\\n- Credits used: unknown\\n- Request ID: nel\"}],\"structuredContent\":{\"query\":\"q\",\"results\":[],\"response_time\":1,\"request_id\":\"nel\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_big_numbers",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"query\":\"q\",\"results\":[{\"title\":\"T\",\"url\":\"u\",\"content\":\"c\",\"score\":5e-7,\"n1\":12345678901234567890,\"n2\":1e21,\"n3\":1.5e300,\"n4\":-0.0,\"n5\":0.1e1,\"n6\":100,\"n7\":1E2,\"n8\":123456789012345678901234,\"n9\":4.35,\"n10\":-1e-7,\"n11\":1e-6}],\"response_time\":1e-7,\"request_id\":\"big\",\"usage\":{\"credits\":1e2}}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Sources\\n\\n[1] T\\nURL: u\\nRelevance score: 0.000\\nc\\n\\nMetadata\\n\\n- Query: q\\n- Response time: 1e-7 seconds\\n- Credits used: 100\\n- Request ID: big\"}],\"structuredContent\":{\"query\":\"q\",\"results\":[{\"title\":\"T\",\"url\":\"u\",\"content\":\"c\",\"score\":5e-7,\"n1\":12345678901234567000,\"n2\":1e+21,\"n3\":1.5e+300,\"n4\":0,\"n5\":1,\"n6\":100,\"n7\":100,\"n8\":1.2345678901234569e+23,\"n9\":4.35,\"n10\":-1e-7,\"n11\":0.000001}],\"response_time\":1e-7,\"request_id\":\"big\",\"usage\":{\"credits\":100}},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_numeric_keys",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"10\":\"ten\",\"query\":\"q\",\"2\":\"two\",\"results\":[],\"b\":1,\"1\":\"one\",\"response_time\":1,\"request_id\":\"nk\",\"4294967295\":\"max\",\"4294967294\":\"maxidx\",\"-1\":\"neg\",\"01\":\"lead\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Sources\\n\\nNo sources were returned.\\n\\nMetadata\\n\\n- Query: q\\n- Response time: 1 seconds\\n- Credits used: unknown\\n- Request ID: nk\"}],\"structuredContent\":{\"1\":\"one\",\"2\":\"two\",\"10\":\"ten\",\"4294967294\":\"maxidx\",\"query\":\"q\",\"results\":[],\"response_time\":1,\"request_id\":\"nk\",\"b\":1,\"4294967295\":\"max\",\"-1\":\"neg\",\"01\":\"lead\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_dup_keys",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"query\":\"first\",\"results\":[],\"response_time\":1,\"request_id\":\"d\",\"query\":\"second\",\"x\":1,\"x\":2}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Sources\\n\\nNo sources were returned.\\n\\nMetadata\\n\\n- Query: second\\n- Response time: 1 seconds\\n- Credits used: unknown\\n- Request ID: d\"}],\"structuredContent\":{\"query\":\"second\",\"results\":[],\"response_time\":1,\"request_id\":\"d\",\"x\":2},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "search_escapes",
+    "tool": "tavily_search",
+    "era": "2026-07-28",
+    "arguments_json": "{\"query\":\"q\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"query\":\"q\\u0000\\u001f\\u007f\\b\\f\\/\\u2028\\\"\\\\\",\"results\":[{\"title\":\"T\\t\",\"url\":\"u\",\"content\":\"line1\\r\\nline2\",\"score\":0.25}],\"response_time\":\"1\",\"request_id\":\"esc\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/search",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"query\":\"q\",\"search_depth\":\"basic\",\"topic\":\"general\",\"max_results\":8,\"include_usage\":true,\"include_raw_content\":false,\"include_answer\":false}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Sources\\n\\n[1] T\\t\\nURL: u\\nRelevance score: 0.250\\nline1\\r\\nline2\\n\\nMetadata\\n\\n- Query: q\\u0000\\u001f\\b\\f/ \\\"\\\\\\n- Response time: 1 seconds\\n- Credits used: unknown\\n- Request ID: esc\"}],\"structuredContent\":{\"query\":\"q\\u0000\\u001f\\b\\f/ \\\"\\\\\",\"results\":[{\"title\":\"T\\t\",\"url\":\"u\",\"content\":\"line1\\r\\nline2\",\"score\":0.25}],\"response_time\":\"1\",\"request_id\":\"esc\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "extract_single_url",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":\" https://a.example/p \"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"results\":[{\"url\":\"https://a.example/p\",\"raw_content\":\"# Page A\\nBody\",\"images\":[\"https://a.example/i.png\",{\"url\":\"https://a.example/j.png\",\"description\":null,\"w\":10}],\"favicon\":null,\"extra\":\"kept\"},{\"url\":\"https://b.example/q\",\"raw_content\":\"Page B\",\"images\":[]}],\"failed_results\":[{\"url\":\"https://bad.example\",\"error\":\"Timeout\"},{\"url\":\"https://worse.example\",\"error\":null},{\"url\":\"https://worst.example\"}],\"response_time\":\"0.84\",\"usage\":{\"credits\":2},\"request_id\":\"req-extract-1\",\"top_extra\":[1,2]}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/extract",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"urls\":[\"https://a.example/p\"],\"extract_depth\":\"basic\",\"include_images\":false,\"include_favicon\":false,\"format\":\"markdown\",\"include_usage\":true}",
+      "timeout_ms": 15000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Extracted pages\\n\\n[1] https://a.example/p\\n\\n# Page A\\nBody\\n\\nImages:\\n- https://a.example/i.png\\n- https://a.example/j.png\\n\\n---\\n\\n[2] https://b.example/q\\n\\nPage B\\n\\nFailed pages\\n\\n- https://bad.example: Timeout\\n- https://worse.example: No error detail was provided.\\n- https://worst.example: No error detail was provided.\\n\\nMetadata\\n\\n- Successful pages: 2\\n- Failed pages: 3\\n- Response time: 0.84 seconds\\n- Credits used: 2\\n- Request ID: req-extract-1\"}],\"structuredContent\":{\"results\":[{\"url\":\"https://a.example/p\",\"raw_content\":\"# Page A\\nBody\",\"images\":[\"https://a.example/i.png\",{\"url\":\"https://a.example/j.png\",\"description\":null,\"w\":10}],\"favicon\":null,\"extra\":\"kept\"},{\"url\":\"https://b.example/q\",\"raw_content\":\"Page B\",\"images\":[]}],\"failed_results\":[{\"url\":\"https://bad.example\",\"error\":\"Timeout\"},{\"url\":\"https://worse.example\",\"error\":null},{\"url\":\"https://worst.example\"}],\"response_time\":\"0.84\",\"usage\":{\"credits\":2},\"request_id\":\"req-extract-1\",\"top_extra\":[1,2]},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "extract_array_query_timeout",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":[\"https://a.example/p\",\"http://b.example/q\"],\"query\":\"  pricing \",\"chunks_per_source\":5,\"extract_depth\":\"advanced\",\"include_images\":true,\"include_favicon\":true,\"format\":\"text\",\"timeout\":5}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"results\":[{\"url\":\"https://a.example/p\",\"raw_content\":\"# Page A\\nBody\",\"images\":[\"https://a.example/i.png\",{\"url\":\"https://a.example/j.png\",\"description\":null,\"w\":10}],\"favicon\":null,\"extra\":\"kept\"},{\"url\":\"https://b.example/q\",\"raw_content\":\"Page B\",\"images\":[]}],\"failed_results\":[{\"url\":\"https://bad.example\",\"error\":\"Timeout\"},{\"url\":\"https://worse.example\",\"error\":null},{\"url\":\"https://worst.example\"}],\"response_time\":\"0.84\",\"usage\":{\"credits\":2},\"request_id\":\"req-extract-1\",\"top_extra\":[1,2]}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/extract",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"urls\":[\"https://a.example/p\",\"http://b.example/q\"],\"extract_depth\":\"advanced\",\"include_images\":true,\"include_favicon\":true,\"format\":\"text\",\"include_usage\":true,\"query\":\"pricing\",\"chunks_per_source\":5,\"timeout\":5}",
+      "timeout_ms": 10000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Extracted pages\\n\\n[1] https://a.example/p\\n\\n# Page A\\nBody\\n\\nImages:\\n- https://a.example/i.png\\n- https://a.example/j.png\\n\\n---\\n\\n[2] https://b.example/q\\n\\nPage B\\n\\nFailed pages\\n\\n- https://bad.example: Timeout\\n- https://worse.example: No error detail was provided.\\n- https://worst.example: No error detail was provided.\\n\\nMetadata\\n\\n- Successful pages: 2\\n- Failed pages: 3\\n- Response time: 0.84 seconds\\n- Credits used: 2\\n- Request ID: req-extract-1\"}],\"structuredContent\":{\"results\":[{\"url\":\"https://a.example/p\",\"raw_content\":\"# Page A\\nBody\",\"images\":[\"https://a.example/i.png\",{\"url\":\"https://a.example/j.png\",\"description\":null,\"w\":10}],\"favicon\":null,\"extra\":\"kept\"},{\"url\":\"https://b.example/q\",\"raw_content\":\"Page B\",\"images\":[]}],\"failed_results\":[{\"url\":\"https://bad.example\",\"error\":\"Timeout\"},{\"url\":\"https://worse.example\",\"error\":null},{\"url\":\"https://worst.example\"}],\"response_time\":\"0.84\",\"usage\":{\"credits\":2},\"request_id\":\"req-extract-1\",\"top_extra\":[1,2]},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "extract_advanced_no_timeout",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":[\"https://a.example/p\"],\"extract_depth\":\"advanced\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"results\":[],\"response_time\":1,\"request_id\":\"e3\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/extract",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"urls\":[\"https://a.example/p\"],\"extract_depth\":\"advanced\",\"include_images\":false,\"include_favicon\":false,\"format\":\"markdown\",\"include_usage\":true}",
+      "timeout_ms": 35000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Extracted pages\\n\\nNo pages were extracted successfully.\\n\\nFailed pages\\n\\nNone\\n\\nMetadata\\n\\n- Successful pages: 0\\n- Failed pages: 0\\n- Response time: 1 seconds\\n- Credits used: unknown\\n- Request ID: e3\"}],\"structuredContent\":{\"results\":[],\"response_time\":1,\"request_id\":\"e3\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "extract_float_timeout",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":\"https://a.example\",\"timeout\":2.5}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"results\":[{\"url\":\"https://a.example\",\"raw_content\":\"A\"}],\"failed_results\":[],\"response_time\":1,\"request_id\":\"e4\",\"usage\":{\"credits\":1}}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/extract",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"urls\":[\"https://a.example\"],\"extract_depth\":\"basic\",\"include_images\":false,\"include_favicon\":false,\"format\":\"markdown\",\"include_usage\":true,\"timeout\":2.5}",
+      "timeout_ms": 7500
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Extracted pages\\n\\n[1] https://a.example\\n\\nA\\n\\nFailed pages\\n\\nNone\\n\\nMetadata\\n\\n- Successful pages: 1\\n- Failed pages: 0\\n- Response time: 1 seconds\\n- Credits used: 1\\n- Request ID: e4\"}],\"structuredContent\":{\"results\":[{\"url\":\"https://a.example\",\"raw_content\":\"A\"}],\"failed_results\":[],\"response_time\":1,\"usage\":{\"credits\":1},\"request_id\":\"e4\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "extract_bad_shape",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":\"https://a.example\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"results\":[{\"url\":\"https://a.example\"}],\"response_time\":1,\"request_id\":\"e5\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/extract",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"urls\":[\"https://a.example\"],\"extract_depth\":\"basic\",\"include_images\":false,\"include_favicon\":false,\"format\":\"markdown\",\"include_usage\":true}",
+      "timeout_ms": 15000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily extraction failed: Tavily API returned an unexpected Extract response.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "extract_bad_image",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":\"https://a.example\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"results\":[{\"url\":\"u\",\"raw_content\":\"c\",\"images\":[5]}],\"response_time\":1,\"request_id\":\"e6\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/extract",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"urls\":[\"https://a.example\"],\"extract_depth\":\"basic\",\"include_images\":false,\"include_favicon\":false,\"format\":\"markdown\",\"include_usage\":true}",
+      "timeout_ms": 15000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily extraction failed: Tavily API returned an unexpected Extract response.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_not_url",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":\"notaurl\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Invalid URL\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_ftp",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":\"ftp://x.example/file\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: urls: URL must use HTTP or HTTPS.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_empty_array",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":[]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: urls: Too small: expected array to have >=1 items\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_21_urls",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":[\"https://e0.example\",\"https://e1.example\",\"https://e2.example\",\"https://e3.example\",\"https://e4.example\",\"https://e5.example\",\"https://e6.example\",\"https://e7.example\",\"https://e8.example\",\"https://e9.example\",\"https://e10.example\",\"https://e11.example\",\"https://e12.example\",\"https://e13.example\",\"https://e14.example\",\"https://e15.example\",\"https://e16.example\",\"https://e17.example\",\"https://e18.example\",\"https://e19.example\",\"https://e20.example\"]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: urls: Too big: expected array to have <=20 items\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_array_bad_item",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":[\"https://ok.example\",\"mailto:a@b.c\"]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: urls.1: URL must use HTTP or HTTPS.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_url_number",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":5}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: urls: Invalid input\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_missing_urls",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: urls: Invalid input\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_timeout_range",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":\"https://a.example\",\"timeout\":0.5,\"chunks_per_source\":6,\"format\":\"html\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: chunks_per_source: Too big: expected number to be <=5, format: Invalid option: expected one of \\\"markdown\\\"|\\\"text\\\", timeout: Too small: expected number to be >=1\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_query_blank",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":\"https://a.example\",\"query\":\" \"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: query: Too small: expected string to have >=1 characters\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_bool_string",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":\"https://a.example\",\"include_images\":\"yes\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: include_images: Invalid input: expected boolean, received string\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_url_spaces_only",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":\"   \"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Invalid URL\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_url_weird",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":[\"https://exa mple.com\",\"http://\",\"https://[::1]:8080/x\",\"HTTPS://UPPER.example/Path?q=1#f\",\"https:/single-slash.example\",\"javascript:alert(1)\"]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Invalid URL\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "crawl_defaults",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"https://docs.example.com\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"base_url\":\"https://docs.example.com\",\"results\":[{\"url\":\"https://docs.example.com/api\",\"raw_content\":\"API docs\",\"images\":[{\"url\":\"https://docs.example.com/x.svg\"}],\"favicon\":\"https://docs.example.com/f.ico\"},{\"url\":\"https://docs.example.com/guide\",\"raw_content\":\"Guide\"}],\"response_time\":4,\"usage\":null,\"request_id\":\"req-crawl-1\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/crawl",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"url\":\"https://docs.example.com\",\"max_depth\":1,\"max_breadth\":10,\"limit\":10,\"allow_external\":false,\"include_images\":false,\"extract_depth\":\"basic\",\"format\":\"markdown\",\"include_favicon\":false,\"timeout\":30,\"include_usage\":true}",
+      "timeout_ms": 35000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Crawled pages\\n\\n[1] https://docs.example.com/api\\n\\nAPI docs\\n\\nImages:\\n- https://docs.example.com/x.svg\\n\\n---\\n\\n[2] https://docs.example.com/guide\\n\\nGuide\\n\\nMetadata\\n\\n- Base URL: https://docs.example.com\\n- Pages returned: 2\\n- Response time: 4 seconds\\n- Credits used: unknown\\n- Request ID: req-crawl-1\"}],\"structuredContent\":{\"base_url\":\"https://docs.example.com\",\"results\":[{\"url\":\"https://docs.example.com/api\",\"raw_content\":\"API docs\",\"images\":[{\"url\":\"https://docs.example.com/x.svg\"}],\"favicon\":\"https://docs.example.com/f.ico\"},{\"url\":\"https://docs.example.com/guide\",\"raw_content\":\"Guide\"}],\"response_time\":4,\"usage\":null,\"request_id\":\"req-crawl-1\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "crawl_everything",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\" https://docs.example.com/start \",\"instructions\":\" find api \",\"chunks_per_source\":2,\"max_depth\":3,\"max_breadth\":500,\"limit\":50,\"select_paths\":[\"/api/.*\"],\"select_domains\":[\"^docs\\\\.\"],\"exclude_paths\":[],\"exclude_domains\":[\"^ads\\\\.\"],\"allow_external\":true,\"include_images\":true,\"extract_depth\":\"advanced\",\"format\":\"text\",\"include_favicon\":true,\"timeout\":150}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"base_url\":\"https://docs.example.com\",\"results\":[],\"response_time\":4,\"usage\":null,\"request_id\":\"req-crawl-1\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/crawl",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"url\":\"https://docs.example.com/start\",\"max_depth\":3,\"max_breadth\":500,\"limit\":50,\"allow_external\":true,\"include_images\":true,\"extract_depth\":\"advanced\",\"format\":\"text\",\"include_favicon\":true,\"timeout\":150,\"include_usage\":true,\"instructions\":\"find api\",\"chunks_per_source\":2,\"select_paths\":[\"/api/.*\"],\"select_domains\":[\"^docs\\\\.\"],\"exclude_domains\":[\"^ads\\\\.\"]}",
+      "timeout_ms": 155000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Crawled pages\\n\\nNo pages matched the crawl configuration.\\n\\nMetadata\\n\\n- Base URL: https://docs.example.com\\n- Pages returned: 0\\n- Response time: 4 seconds\\n- Credits used: unknown\\n- Request ID: req-crawl-1\"}],\"structuredContent\":{\"base_url\":\"https://docs.example.com\",\"results\":[],\"response_time\":4,\"usage\":null,\"request_id\":\"req-crawl-1\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "crawl_float_timeout",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"https://docs.example.com\",\"timeout\":30.5}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"base_url\":\"b\",\"results\":[{\"url\":\"u\",\"raw_content\":\"r\",\"images\":[]}],\"response_time\":\"7\",\"request_id\":\"c3\",\"usage\":{\"credits\":3,\"x\":1}}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/crawl",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"url\":\"https://docs.example.com\",\"max_depth\":1,\"max_breadth\":10,\"limit\":10,\"allow_external\":false,\"include_images\":false,\"extract_depth\":\"basic\",\"format\":\"markdown\",\"include_favicon\":false,\"timeout\":30.5,\"include_usage\":true}",
+      "timeout_ms": 35500
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Crawled pages\\n\\n[1] u\\n\\nr\\n\\nMetadata\\n\\n- Base URL: b\\n- Pages returned: 1\\n- Response time: 7 seconds\\n- Credits used: 3\\n- Request ID: c3\"}],\"structuredContent\":{\"base_url\":\"b\",\"results\":[{\"url\":\"u\",\"raw_content\":\"r\",\"images\":[]}],\"response_time\":\"7\",\"usage\":{\"credits\":3},\"request_id\":\"c3\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "crawl_bad_shape",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"https://docs.example.com\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"results\":[],\"response_time\":1,\"request_id\":\"c4\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/crawl",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"url\":\"https://docs.example.com\",\"max_depth\":1,\"max_breadth\":10,\"limit\":10,\"allow_external\":false,\"include_images\":false,\"extract_depth\":\"basic\",\"format\":\"markdown\",\"include_favicon\":false,\"timeout\":30,\"include_usage\":true}",
+      "timeout_ms": 35000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily crawl failed: Tavily API returned an unexpected Crawl response.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "crawl_http_429",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"https://docs.example.com\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 429,
+      "statusText": "Too Many Requests",
+      "body": "{\"detail\":{\"error\":\"rate limited\"}}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/crawl",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"url\":\"https://docs.example.com\",\"max_depth\":1,\"max_breadth\":10,\"limit\":10,\"allow_external\":false,\"include_images\":false,\"extract_depth\":\"basic\",\"format\":\"markdown\",\"include_favicon\":false,\"timeout\":30,\"include_usage\":true}",
+      "timeout_ms": 35000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily crawl failed: Tavily API returned HTTP 429: {\\\"detail\\\":{\\\"error\\\":\\\"rate limited\\\"}}\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_crawl_bad_url",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"docs.example.com\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Invalid URL\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_crawl_ranges",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"https://d.example\",\"limit\":51,\"timeout\":9,\"max_depth\":6,\"max_breadth\":0,\"chunks_per_source\":1.5}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_crawl: chunks_per_source: Invalid input: expected int, received number, max_depth: Too big: expected number to be <=5, max_breadth: Too small: expected number to be >=1, limit: Too big: expected number to be <=50, timeout: Too small: expected number to be >=10\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_crawl_regex_list",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"https://d.example\",\"select_paths\":[\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\",\"/x\"],\"exclude_paths\":[\"\"]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_crawl: select_paths: Too big: expected array to have <=50 items, exclude_paths.0: Too small: expected string to have >=1 characters\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_crawl_instructions_long",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"https://d.example\",\"instructions\":\"iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii\",\"allow_external\":1}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_crawl: instructions: Too big: expected string to have <=2000 characters, allow_external: Invalid input: expected boolean, received number\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "research_start_defaults",
+    "tool": "tavily_research",
+    "era": "2026-07-28",
+    "arguments_json": "{\"input\":\"  Compare A and B  \"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"pending\",\"input\":\"Compare A and B\",\"model\":\"mini\",\"response_time\":0.31,\"extra\":{\"x\":1}}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/research",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"input\":\"Compare A and B\",\"model\":\"mini\",\"stream\":false,\"citation_format\":\"numbered\",\"output_length\":\"standard\"}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily Research task created.\\n\\n- Status: pending\\n- Model: mini\\n- Request ID: req-research-1\\n- Created at: 2026-11-01T12:00:00Z\\n\\nWait a few seconds, then call tavily_research_status with this request ID. Do not create the task again.\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"pending\",\"input\":\"Compare A and B\",\"model\":\"mini\",\"response_time\":0.31,\"extra\":{\"x\":1}},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "research_start_all",
+    "tool": "tavily_research",
+    "era": "2026-07-28",
+    "arguments_json": "{\"input\":\"Compare\",\"model\":\"pro\",\"citation_format\":\"apa\",\"output_length\":\"long\",\"include_domains\":[\"a.org\"],\"exclude_domains\":[]}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"pending\",\"input\":\"Compare A and B\",\"model\":\"pro\",\"response_time\":\"1\",\"extra\":{\"x\":1}}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/research",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"input\":\"Compare\",\"model\":\"pro\",\"stream\":false,\"citation_format\":\"apa\",\"output_length\":\"long\",\"include_domains\":[\"a.org\"]}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily Research task created.\\n\\n- Status: pending\\n- Model: pro\\n- Request ID: req-research-1\\n- Created at: 2026-11-01T12:00:00Z\\n\\nWait a few seconds, then call tavily_research_status with this request ID. Do not create the task again.\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"pending\",\"input\":\"Compare A and B\",\"model\":\"pro\",\"response_time\":\"1\",\"extra\":{\"x\":1}},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "research_start_429",
+    "tool": "tavily_research",
+    "era": "2026-07-28",
+    "arguments_json": "{\"input\":\"x\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 429,
+      "statusText": "Too Many Requests",
+      "body": "slow down"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/research",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"input\":\"x\",\"model\":\"mini\",\"stream\":false,\"citation_format\":\"numbered\",\"output_length\":\"standard\"}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Failed to start Tavily Research: Tavily API returned HTTP 429: slow down\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "research_start_bad_shape",
+    "tool": "tavily_research",
+    "era": "2026-07-28",
+    "arguments_json": "{\"input\":\"x\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"r\",\"status\":\"pending\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/research",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"input\":\"x\",\"model\":\"mini\",\"stream\":false,\"citation_format\":\"numbered\",\"output_length\":\"standard\"}",
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Failed to start Tavily Research: Tavily API returned an unexpected Research task response.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_research_blank",
+    "tool": "tavily_research",
+    "era": "2026-07-28",
+    "arguments_json": "{\"input\":\"  \"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_research: input: Too small: expected string to have >=1 characters\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_research_enums",
+    "tool": "tavily_research",
+    "era": "2026-07-28",
+    "arguments_json": "{\"input\":\"x\",\"model\":\"max\",\"citation_format\":\"ieee\",\"output_length\":\"huge\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_research: model: Invalid option: expected one of \\\"mini\\\"|\\\"pro\\\"|\\\"auto\\\", citation_format: Invalid option: expected one of \\\"numbered\\\"|\\\"mla\\\"|\\\"apa\\\"|\\\"chicago\\\", output_length: Invalid option: expected one of \\\"short\\\"|\\\"standard\\\"|\\\"long\\\"\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_research_domains",
+    "tool": "tavily_research",
+    "era": "2026-07-28",
+    "arguments_json": "{\"input\":\"x\",\"include_domains\":[\"d0.org\",\"d1.org\",\"d2.org\",\"d3.org\",\"d4.org\",\"d5.org\",\"d6.org\",\"d7.org\",\"d8.org\",\"d9.org\",\"d10.org\",\"d11.org\",\"d12.org\",\"d13.org\",\"d14.org\",\"d15.org\",\"d16.org\",\"d17.org\",\"d18.org\",\"d19.org\",\"d20.org\"]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_research: include_domains: Too big: expected array to have <=20 items\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_research_input_too_long",
+    "tool": "tavily_research",
+    "era": "2026-07-28",
+    "arguments_json": "{\"input\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_research: input: Too big: expected string to have <=20000 characters\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_research_items_and_length",
+    "tool": "tavily_research",
+    "era": "2026-07-28",
+    "arguments_json": "{\"input\":\"x\",\"include_domains\":[\" \",\"d0.org\",\"d1.org\",\"d2.org\",\"d3.org\",\"d4.org\",\"d5.org\",\"d6.org\",\"d7.org\",\"d8.org\",\"d9.org\",\"d10.org\",\"d11.org\",\"d12.org\",\"d13.org\",\"d14.org\",\"d15.org\",\"d16.org\",\"d17.org\",\"d18.org\",\"d19.org\",\"\"]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_research: include_domains.0: Too small: expected string to have >=1 characters, include_domains.21: Too small: expected string to have >=1 characters, include_domains: Too big: expected array to have <=20 items\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_union_array_of_numbers",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":[1,2]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: urls: Invalid input\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_union_object",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":{\"a\":1}}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: urls: Invalid input\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_union_null",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":null}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: urls: Invalid input\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_array_empty_string_item",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":[\"https://ok.example\",\"ftp://x\",\" \"]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Invalid URL\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_extract_array_too_many_invalid",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":[\"https://e0.example\",\"https://e1.example\",\"https://e2.example\",\"https://e3.example\",\"https://e4.example\",\"https://e5.example\",\"https://e6.example\",\"https://e7.example\",\"https://e8.example\",\"https://e9.example\",\"https://e10.example\",\"https://e11.example\",\"https://e12.example\",\"https://e13.example\",\"https://e14.example\",\"https://e15.example\",\"https://e16.example\",\"https://e17.example\",\"https://e18.example\",\"https://e19.example\",\"ftp://x\"]}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_extract: urls.20: URL must use HTTP or HTTPS., urls: Too big: expected array to have <=20 items\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_crawl_url_then_other",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"ftp://d.example\",\"limit\":0}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_crawl: url: URL must use HTTP or HTTPS., limit: Too small: expected number to be >=1\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_crawl_url_unparsable_with_other",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"::\",\"limit\":0}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Invalid URL\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_crawl_url_number",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":5}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_crawl: url: Invalid input: expected string, received number\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_crawl_url_missing",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_crawl: url: Invalid input: expected string, received undefined\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "crawl_url_normalization_kept",
+    "tool": "tavily_crawl",
+    "era": "2026-07-28",
+    "arguments_json": "{\"url\":\"HTTPS://Docs.Example.com:443/a/../b?x=1#frag\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"base_url\":\"b\",\"results\":[],\"response_time\":1,\"request_id\":\"n\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/crawl",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"url\":\"HTTPS://Docs.Example.com:443/a/../b?x=1#frag\",\"max_depth\":1,\"max_breadth\":10,\"limit\":10,\"allow_external\":false,\"include_images\":false,\"extract_depth\":\"basic\",\"format\":\"markdown\",\"include_favicon\":false,\"timeout\":30,\"include_usage\":true}",
+      "timeout_ms": 35000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Crawled pages\\n\\nNo pages matched the crawl configuration.\\n\\nMetadata\\n\\n- Base URL: b\\n- Pages returned: 0\\n- Response time: 1 seconds\\n- Credits used: unknown\\n- Request ID: n\"}],\"structuredContent\":{\"base_url\":\"b\",\"results\":[],\"response_time\":1,\"request_id\":\"n\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "extract_url_variants_ok",
+    "tool": "tavily_extract",
+    "era": "2026-07-28",
+    "arguments_json": "{\"urls\":[\"https:/single-slash.example\",\"https://[::1]:8080/x\",\"http://xn--nxasmq6b.example\",\"https://ñandú.example/ruta?q=á\",\"http://1.2.3.4\",\"https://user:pw@host.example\"]}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"results\":[],\"response_time\":1,\"request_id\":\"uv\"}"
+    },
+    "expected_request": {
+      "method": "POST",
+      "origin": "https://api.tavily.com",
+      "path": "/extract",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": "application/json",
+      "body": "{\"urls\":[\"https:/single-slash.example\",\"https://[::1]:8080/x\",\"http://xn--nxasmq6b.example\",\"https://ñandú.example/ruta?q=á\",\"http://1.2.3.4\",\"https://user:pw@host.example\"],\"extract_depth\":\"basic\",\"include_images\":false,\"include_favicon\":false,\"format\":\"markdown\",\"include_usage\":true}",
+      "timeout_ms": 15000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Extracted pages\\n\\nNo pages were extracted successfully.\\n\\nFailed pages\\n\\nNone\\n\\nMetadata\\n\\n- Successful pages: 0\\n- Failed pages: 0\\n- Response time: 1 seconds\\n- Credits used: unknown\\n- Request ID: uv\"}],\"structuredContent\":{\"results\":[],\"response_time\":1,\"request_id\":\"uv\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_pending",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\" req-research-1 \"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":12.25,\"status\":\"in_progress\",\"extra\":true}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/req-research-1",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily Research is still in progress.\\n\\n- Status: in_progress\\n- Request ID: req-research-1\\n\\nWait approximately five seconds before checking again.\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"in_progress\",\"response_time\":12.25,\"extra\":true},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_failed_with_error",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"r\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":12.25,\"status\":\"failed\",\"error\":\"model crashed\"}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/r",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily Research task failed.\\n\\n- Request ID: req-research-1\\n- Error: model crashed\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"failed\",\"response_time\":12.25,\"error\":\"model crashed\"},\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_failed_no_error",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"r\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":12.25,\"status\":\"failed\",\"error\":null}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/r",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily Research task failed.\\n\\n- Request ID: req-research-1\\n- Error: No error detail was provided.\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"failed\",\"response_time\":12.25,\"error\":null},\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_completed_string",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"r\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":12.25,\"status\":\"completed\",\"content\":\"# Report\\n\\nA beats B [1].\",\"sources\":[{\"title\":\"Src A\",\"url\":\"https://a.org\",\"favicon\":null,\"extra\":1},{\"title\":\"Src B\",\"url\":\"https://b.org\"}]}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/r",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"# Report\\n\\nA beats B [1].\\n\\nSources\\n\\n[1] Src A\\nhttps://a.org\\n\\n[2] Src B\\nhttps://b.org\\n\\nMetadata\\n\\n- Status: completed\\n- Request ID: req-research-1\\n- Response time: 12.25 seconds\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"completed\",\"content\":\"# Report\\n\\nA beats B [1].\",\"sources\":[{\"title\":\"Src A\",\"url\":\"https://a.org\",\"favicon\":null,\"extra\":1},{\"title\":\"Src B\",\"url\":\"https://b.org\"}],\"response_time\":12.25},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_completed_has_sources_heading",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"r\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":12.25,\"status\":\"completed\",\"content\":\"Body\\n\\n  ### Sources:  \\n[1] x\",\"sources\":[{\"title\":\"S\",\"url\":\"https://s.org\"}]}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/r",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Body\\n\\n  ### Sources:  \\n[1] x\\n\\nMetadata\\n\\n- Status: completed\\n- Request ID: req-research-1\\n- Response time: 12.25 seconds\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"completed\",\"content\":\"Body\\n\\n  ### Sources:  \\n[1] x\",\"sources\":[{\"title\":\"S\",\"url\":\"https://s.org\"}],\"response_time\":12.25},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_completed_sources_inline_word",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"r\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":12.25,\"status\":\"completed\",\"content\":\"These sources are good\\nSOURCES\\r\\n- a\",\"sources\":[]}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/r",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"These sources are good\\nSOURCES\\r\\n- a\\n\\nMetadata\\n\\n- Status: completed\\n- Request ID: req-research-1\\n- Response time: 12.25 seconds\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"completed\",\"content\":\"These sources are good\\nSOURCES\\r\\n- a\",\"sources\":[],\"response_time\":12.25},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_completed_object",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"r\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":\"9.5\",\"status\":\"completed\",\"content\":{\"summary\":\"s\",\"items\":[1,{\"a\":null}],\"nested\":{\"ñ\":\"é\"}}}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/r",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"summary\\\": \\\"s\\\",\\n  \\\"items\\\": [\\n    1,\\n    {\\n      \\\"a\\\": null\\n    }\\n  ],\\n  \\\"nested\\\": {\\n    \\\"ñ\\\": \\\"é\\\"\\n  }\\n}\\n\\nSources\\n\\nNo sources were returned.\\n\\nMetadata\\n\\n- Status: completed\\n- Request ID: req-research-1\\n- Response time: 9.5 seconds\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"completed\",\"content\":{\"summary\":\"s\",\"items\":[1,{\"a\":null}],\"nested\":{\"ñ\":\"é\"}},\"response_time\":\"9.5\"},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_completed_null_content",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"r\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":12.25,\"status\":\"completed\",\"content\":null}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/r",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"No report content was returned.\\n\\nSources\\n\\nNo sources were returned.\\n\\nMetadata\\n\\n- Status: completed\\n- Request ID: req-research-1\\n- Response time: 12.25 seconds\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"completed\",\"content\":null,\"response_time\":12.25},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_completed_empty_string",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"r\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":12.25,\"status\":\"completed\",\"content\":\"\",\"sources\":[{\"title\":\"S\",\"url\":\"u\"}]}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/r",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"\\n\\nSources\\n\\n[1] S\\nu\\n\\nMetadata\\n\\n- Status: completed\\n- Request ID: req-research-1\\n- Response time: 12.25 seconds\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"completed\",\"content\":\"\",\"sources\":[{\"title\":\"S\",\"url\":\"u\"}],\"response_time\":12.25},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_encoded_id",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"a b/c?d#e&é\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":12.25,\"status\":\"pending\"}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/a%20b%2Fc%3Fd%23e%26%C3%A9",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Tavily Research is still in progress.\\n\\n- Status: pending\\n- Request ID: req-research-1\\n\\nWait approximately five seconds before checking again.\"}],\"structuredContent\":{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"status\":\"pending\",\"response_time\":12.25},\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_bad_shape",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"r\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"r\",\"status\":\"completed\"}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/r",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Failed to retrieve Tavily Research: Tavily API returned an unexpected Research status response.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_bad_sources",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"r\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":12.25,\"status\":\"completed\",\"content\":\"x\",\"sources\":[{\"title\":\"S\"}]}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/r",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Failed to retrieve Tavily Research: Tavily API returned an unexpected Research status response.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "status_content_array",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"r\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": {
+      "status": 200,
+      "statusText": "OK",
+      "body": "{\"request_id\":\"req-research-1\",\"created_at\":\"2026-11-01T12:00:00Z\",\"response_time\":12.25,\"status\":\"completed\",\"content\":[1,2]}"
+    },
+    "expected_request": {
+      "method": "GET",
+      "origin": "https://api.tavily.com",
+      "path": "/research/r",
+      "authorization": "Bearer tvly-golden-key",
+      "content_type": null,
+      "body": null,
+      "timeout_ms": 30000
+    },
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Failed to retrieve Tavily Research: Tavily API returned an unexpected Research status response.\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_status_blank",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{\"request_id\":\"\"}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_research_status: request_id: Too small: expected string to have >=1 characters\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  },
+  {
+    "name": "v_status_missing",
+    "tool": "tavily_research_status",
+    "era": "2026-07-28",
+    "arguments_json": "{}",
+    "api_key": "tvly-golden-key",
+    "upstream": null,
+    "expected_request": null,
+    "expected_result_json": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Input validation error: Invalid arguments for tool tavily_research_status: request_id: Invalid input: expected string, received undefined\"}],\"isError\":true,\"resultType\":\"complete\",\"_meta\":{\"io.modelcontextprotocol/serverInfo\":{\"name\":\"mcp-tavily-research\",\"version\":\"1.0.0\"}}},\"jsonrpc\":\"2.0\",\"id\":2}"
+  }
+]

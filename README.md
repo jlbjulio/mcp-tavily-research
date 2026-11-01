@@ -1,6 +1,10 @@
 # MCP Tavily Research
 
-A TypeScript MCP server that gives coding agents access to Tavily Search, Extract, Crawl, and Research.
+An MCP server that gives coding agents Tavily Search, Extract, Crawl, and Research, as a single small executable.
+
+- About 2 MB on disk and under 10 MB of RAM per agent session, with no Node.js or `node_modules`.
+- Starts in about 10 ms.
+- Works with Claude Code, Codex, and any MCP client that launches stdio servers.
 
 ## Tools
 
@@ -18,12 +22,12 @@ Tool parameters use Tavily's original `snake_case` names, such as `search_depth`
 
 ## Quick start
 
-Requirements: Node.js 22+, npm, and a [Tavily API key](https://app.tavily.com/).
+Requirements: [Rust](https://rustup.rs/) and a [Tavily API key](https://app.tavily.com/).
 
 ```powershell
 git clone https://github.com/jlbjulio/mcp-tavily-research.git
 cd mcp-tavily-research
-npm install
+cargo install --path .
 Copy-Item .env.example .env
 ```
 
@@ -33,13 +37,13 @@ Add your API key to `.env`:
 TAVILY_API_KEY=your_real_tavily_api_key
 ```
 
-Build the server:
+`cargo install` puts `mcp-tavily-research` in Cargo's bin folder (`~/.cargo/bin`), which is on your `PATH`. The `.env` file is ignored by Git. Never commit your API key.
+
+## Connect to Claude Code
 
 ```powershell
-npm run check
+claude mcp add tavily-research --scope user -- mcp-tavily-research --env-file-if-exists=C:/path/to/mcp-tavily-research/.env
 ```
-
-The `.env` file is ignored by Git. Never commit your API key.
 
 ## Connect to Codex
 
@@ -48,17 +52,11 @@ Create a local STDIO MCP server with these values:
 | Field | Value |
 | --- | --- |
 | Name | `tavily-research` |
-| Command to launch | `node` |
-| Arguments | `--env-file-if-exists=.env` and `dist/index.js` |
+| Command to launch | `mcp-tavily-research` |
+| Arguments | `--env-file-if-exists=.env` |
 | Environment variables | Leave empty |
 | Environment variable passthrough | Leave empty |
 | Working directory | Absolute path to this repository |
-
-Example working directory:
-
-```text
-C:\Users\your-name\Documents\GitHub\mcp-tavily-research
-```
 
 Save the configuration and restart the MCP server. You should see:
 
@@ -71,6 +69,8 @@ tavily_research_status
 ```
 
 See the [Codex MCP documentation](https://developers.openai.com/codex/mcp/) for manual configuration and timeout options.
+
+Instead of an `.env` file you can also set `TAVILY_API_KEY` in the client's environment variables.
 
 ## Example prompts
 
@@ -96,27 +96,14 @@ Check [Tavily's current credit documentation](https://docs.tavily.com/documentat
 
 | Command | Description |
 | --- | --- |
-| `npm run dev` | Run the TypeScript source with `tsx`. |
-| `npm run typecheck` | Check TypeScript without creating files. |
-| `npm run build` | Compile the project into `dist/`. |
-| `npm run check` | Run type checking and a clean build. |
-| `npm run clean` | Delete generated files from `dist/`. |
-| `npm start` | Run the compiled MCP server. |
-
-## Project structure
-
-- `src/tools/`: tools exposed to MCP clients.
-- `src/tavily/api.ts`: shared connection, authentication, errors, and response validation.
-- `src/tavily/search.ts`, `extract.ts`, `crawl.ts`, and `research.ts`: Tavily endpoint logic.
-- `src/server.ts`: server setup and tool registration.
-- `src/index.ts`: STDIO entry point.
-- `src/config.ts`: API key configuration.
+| `cargo install --path .` | Build and install the server. Close the MCP clients using it first. |
+| `cargo test` | Run the test suite. |
+| `cargo build --release` | Build `target/release/mcp-tavily-research.exe` without installing it. |
 
 ## Test with MCP Inspector
 
 ```powershell
-npm run build
-npx @modelcontextprotocol/inspector node --env-file-if-exists=.env dist/index.js
+npx @modelcontextprotocol/inspector mcp-tavily-research --env-file-if-exists=.env
 ```
 
 Use Search or a one-URL Extract request for the first test to keep credit usage low.

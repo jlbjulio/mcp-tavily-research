@@ -1,8 +1,5 @@
-# Dependencies
-node_modules/
-
-# Compiled output
-dist/
+# Build output
+/target/
 
 # Environment variables and secrets
 .env

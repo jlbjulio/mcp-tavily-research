@@ -1,0 +1,21 @@
+[package]
+name = "mcp-tavily-research"
+version = "2.0.0"
+edition = "2024"
+rust-version = "1.85"
+description = "An MCP server for Tavily-powered search, extraction, crawling, and research"
+license = "ISC"
+repository = "https://github.com/jlbjulio/mcp-tavily-research"
+keywords = ["mcp", "model-context-protocol", "tavily", "search", "research"]
+
+[dependencies]
+# arbitrary_precision keeps numbers such as 1e400 parseable; JavaScript reads them as Infinity.
+serde_json = { version = "1.0.140", features = ["preserve_order", "arbitrary_precision"] }
+ureq = "3.5"
+url = "2.5"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true
